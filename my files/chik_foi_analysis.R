@@ -1,6 +1,7 @@
 library(readxl)
 library(dplyr)
-chikdata <- read_excel("my files/chikungunya_data_Uganda.xlsx")
+library(here)
+chikdata <- read_excel(here("Data", "chikungunya_data_Uganda.xlsx"))
 chikdata <- chikdata %>%  select(UniqueKey, Year, Age_Yrs,IgM_CHIK)
 chikdata <- chikdata %>%
   mutate(
