@@ -21,6 +21,14 @@ chikdata <- chikdata %>%
     )
   )
 
+##SEROFOI PACKAGE
+#Serofoi package is a tool used to estimate the force of infection(FOI) from a population based serosurvey data.
+# FOI quantifies the risk of susceptible individuals becoming infected over a period of time
+#We gain insights into the transmission of chikungunya dynamics in uganda, a sentinel hospital based survey data
+#collected between 2028 to 2024
+#Serofoi is used to compare three potential scenarios of chikungunya transmission, constant endemic, 
+#epidemic slow and epidemic fast
+
 #chikungunya transmission in 2019
 chikdata2019 <- data.frame(
   survey_year = c(2019,2019,2019,2019,2019),
