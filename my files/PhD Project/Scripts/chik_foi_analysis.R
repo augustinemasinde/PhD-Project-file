@@ -1,4 +1,5 @@
 library(readxl)
+library(serofoi)
 library(dplyr)
 library(here)
 chikdata <- read_excel(here("Data", "chikungunya_data_Uganda.xlsx"))
