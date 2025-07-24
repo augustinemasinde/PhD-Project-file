@@ -29,7 +29,7 @@ chikdata <- chikdata %>%
 #Serofoi is used to compare three potential scenarios of chikungunya transmission, constant endemic, 
 #epidemic slow and epidemic fast
 
-#chikungunya transmission in 2019
+#chikungunya transmission data in 2019
 chikdata2019 <- data.frame(
   survey_year = c(2019,2019,2019,2019,2019),
   n_sample = c(115, 55,169, 23,9),
@@ -42,14 +42,15 @@ chikdata2019 <- chikdata2019 %>%
   mutate(n_sample = as.integer(n_sample))
 
 # Implementation of the models
+
+#constant endemic model2019
 seromodel_constant <- fit_seromodel(
   serosurvey = chikdata2019,
   model_type = "constant",
   iter = 1000
 )
 
-
-
+#Epidemic slow 2019
 foi_index <- get_foi_index(chikdata2019, group_size = 5, model_type = "time")
 seromodel_time <- fit_seromodel(
   serosurvey = chikdata2019,
@@ -59,7 +60,7 @@ seromodel_time <- fit_seromodel(
   iter = 2500
 )
 
-
+#Epidemic fast 2019
 foi_index <- get_foi_index(chikdata2019, group_size = 5, model_type = "time")
 seromodel_log_time <- fit_seromodel(
   serosurvey = chikdata2019,
@@ -95,7 +96,7 @@ cowplot::plot_grid(plot_constant, plot_time, plot_log_time, ncol = 3)
 
 
 
-#chikungunya transmission in 2020
+#chikungunya transmission data  in 2020
 chikdata2020 <- data.frame(
   survey_year = c(2020,2020,2020,2020,2020),
   n_sample = c(77, 31,292, 49,21),
@@ -108,14 +109,15 @@ chikdata2020 <- chikdata2020 %>%
   mutate(n_sample = as.integer(n_sample))
 
 # Implementation of the models
+
+#constant endemic 2020
 seromodel_constant <- fit_seromodel(
   serosurvey = chikdata2020,
   model_type = "constant",
   iter = 1000
 )
 
-
-
+#Epidemic slow 2020
 foi_index <- get_foi_index(chikdata2020, group_size = 5, model_type = "time")
 seromodel_time <- fit_seromodel(
   serosurvey = chikdata2020,
@@ -125,7 +127,7 @@ seromodel_time <- fit_seromodel(
   iter = 2500
 )
 
-
+#Epidemic fast 2020
 foi_index <- get_foi_index(chikdata2020, group_size = 5, model_type = "time")
 seromodel_log_time <- fit_seromodel(
   serosurvey = chikdata2020,
@@ -160,7 +162,7 @@ plot_log_time <- plot_seromodel(
 cowplot::plot_grid(plot_constant, plot_time, plot_log_time, ncol = 3)
 
 
-#chikungunya transmission in 2021
+#chikungunya transmission data in 2021
 chikdata2021 <- data.frame(
   survey_year = c(2021,2021,2021,2021,2021),
   n_sample = c(51, 42,345, 48,22),
@@ -173,6 +175,8 @@ chikdata2021 <- chikdata2021 %>%
   mutate(n_sample = as.integer(n_sample))
 
 # Implementation of the models
+
+# Constant endemic 2021
 seromodel_constant <- fit_seromodel(
   serosurvey = chikdata2021,
   model_type = "constant",
@@ -180,7 +184,7 @@ seromodel_constant <- fit_seromodel(
 )
 
 
-
+# Epidemic slow 2021
 foi_index <- get_foi_index(chikdata2021, group_size = 5, model_type = "time")
 seromodel_time <- fit_seromodel(
   serosurvey = chikdata2021,
@@ -190,7 +194,7 @@ seromodel_time <- fit_seromodel(
   iter = 2500
 )
 
-
+#Epidemic fast 2021
 foi_index <- get_foi_index(chikdata2021, group_size = 5, model_type = "time")
 seromodel_log_time <- fit_seromodel(
   serosurvey = chikdata2021,
@@ -225,7 +229,7 @@ plot_log_time <- plot_seromodel(
 cowplot::plot_grid(plot_constant, plot_time, plot_log_time, ncol = 3)
 
 
-#chikungunya transmission in 2022
+#chikungunya transmission data in 2022
 chikdata2022 <- data.frame(
   survey_year = c(2022,2022,2022,2022,2022),
   n_sample = c(6, 7,56, 6,6),
@@ -238,6 +242,8 @@ chikdata2022 <- chikdata2022 %>%
   mutate(n_sample = as.integer(n_sample))
 
 # Implementation of the models
+
+#Constant endemic 2022
 seromodel_constant <- fit_seromodel(
   serosurvey = chikdata2022,
   model_type = "constant",
@@ -245,7 +251,7 @@ seromodel_constant <- fit_seromodel(
 )
 
 
-
+#Epidemic slow 2022
 foi_index <- get_foi_index(chikdata2022, group_size = 5, model_type = "time")
 seromodel_time <- fit_seromodel(
   serosurvey = chikdata2022,
@@ -255,7 +261,7 @@ seromodel_time <- fit_seromodel(
   iter = 2500
 )
 
-
+#Epidemic fast 2022
 foi_index <- get_foi_index(chikdata2022, group_size = 5, model_type = "time")
 seromodel_log_time <- fit_seromodel(
   serosurvey = chikdata2022,
