@@ -29,19 +29,16 @@ serosolver <- FALSE
 ## Filename prefix for all saved outputs
 filename <- "chikungunya_data_test"
 filenames <- paste0(filename, "_",1:5)
-
-
 cl <- makeCluster(detectCores(), type='PSOCK')
 registerDoParallel(cl)
 registerDoMC(cores=5)
 stopCluster(cl)
 foreach(i = 1:5) %dopar% { Sys.getpid() }
 
-
 #import data
-chikdata <-read_excel("Data/chikungunya_data_Uganda.xlsx")
+chikdata <-read_excel(here("Data", "chikungunya_data_Uganda.xlsx"))
 
-set.seed(123)  # For reproducibility
+set.seed(123) 
 
 chikdata$titre <- NA_real_
 
@@ -63,8 +60,6 @@ chikdata$DOB <- as.numeric(format(Sys.Date(), "%Y")) - chikdata$Age_Yrs
 
 #Data cleaning
 chikdata$DOB[chikdata$DOB == "1891"] <- "1991"
-# Ensure DOB is a Date
-chikdata$DOB <- as.Date(chikdata$DOB)
 
 #recode Nengative to Negative
 chikdata$IgM_CHIK[chikdata$IgM_CHIK == "Nengative"] <- "Negative"
@@ -86,7 +81,6 @@ chikdata <- chikdata %>% dplyr::rename(individual = UniqueKey)
 chikdata$titre <- log2(chikdata$titre)
 chikdata <- chikdata %>% select(individual,virus,titre,samples,DOB,run, Year)
 chikdata <- chikdata[chikdata$Year == 2021, ]
-chikdata$DOB <- year(chikdata$DOB)
 chikdata$group <- c(rep(1, nrow(chikdata)))
 chikdata <- chikdata %>%  select(individual, DOB, virus, titre, samples, run, group)
 chikdata$individual <- 1:nrow(chikdata)
