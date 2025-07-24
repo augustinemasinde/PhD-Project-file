@@ -47,7 +47,7 @@ chikdata$titre[chikdata$IgM_CHIK == "Negative"] <- runif(
   sum(chikdata$IgM_CHIK == "Negative"), min = 0, max = 10
 )
 
-# Assign higher titres to seropositive individuals
+# Assigning higher titres to seropositive individuals
 chikdata$titre[chikdata$IgM_CHIK == "Positive"] <- rlnorm(
   sum(chikdata$IgM_CHIK == "Positive"), meanlog = log(40), sdlog = 0.4
 )
@@ -95,18 +95,18 @@ set.seed(123)  # for reproducibility
 
 chikdata$titre <- sapply(chikdata$virus, function(year) {
   if (year == 2019) {
-    val <- rnorm(1, mean = 3.5, sd = 1.2)  # lower mean titre
+    val <- rnorm(1, mean = 3.5, sd = 1.2) 
   } else if (year == 2020) {
-    val <- rnorm(1, mean = 5.0, sd = 1.2)  # higher mean titre
+    val <- rnorm(1, mean = 5.0, sd = 1.2)  
   } else {
-    val <- rnorm(1, mean = 4.0, sd = 1.2)  # fallback
+    val <- rnorm(1, mean = 4.0, sd = 1.2) 
   }
-  val <- max(min(val, 7), 0)  # clamp between 0 and 7
+  val <- max(min(val, 7), 0)  
   return(val)
 })
 
 filename <- "serosurvey_2"
-resolution <- 1 ## eg. this would be set to 12 for monthly resolution
+resolution <- 1 
 sample_year <- 2021
 
 serosolver::describe_priors()
@@ -115,7 +115,6 @@ prior_version <- 2
 
 
 par_tab_path <- system.file("extdata", "par_tab_base.csv", package = "serosolver")
-
 par_tab <- read.csv(file = par_tab_path, stringsAsFactors=FALSE)
 
 
@@ -123,6 +122,7 @@ par_tab <- read.csv(file = par_tab_path, stringsAsFactors=FALSE)
 beta_pars <- find_beta_prior_mode(0.15,4)
 par_tab[par_tab$names == "alpha","values"] <- beta_pars$alpha
 par_tab[par_tab$names == "beta","values"] <- beta_pars$beta
+
 ## Maximum recordable log titre in these data is 8
 par_tab[par_tab$names == "MAX_TITRE","values"] <- 8
 
@@ -162,19 +162,6 @@ chain_path_real <- paste0(chain_path, "cs2_real/")
 chain_path_sim <- paste0(chain_path, "cs2_sim/")
 
 
-
-## Read in raw coordinates
-antigenic_coords <- read_csv("~/Desktop/my files/antigenic coord.csv")
-print(head(antigenic_coords))
-
-#>       x_coord   y_coord inf_times
-#> 1 -0.09718111 0.5021363      1968
-#> 2  0.80502804 1.6816917      1969
-#> 3  1.70723718 2.8612472      1970
-#> 4  2.60944633 3.9976902      1971
-#> 5  3.51165548 4.8709093      1972
-#> 6  4.41386463 5.5057039      1973
-
 ## More flexible version of the above function
 virus_key <- c("EAL" = 2019, "SAL" = 2020, "EAL1" = 2019, "SAL1" = 2020)
 antigenic_coords$Strain <- virus_key[antigenic_coords$Strain]
@@ -190,7 +177,7 @@ strain_isolation_times <- unique(antigenic_map$inf_times)
 model_func <- create_posterior_func(par_tab=par_tab,
                                     antibody_data = antibody_data,
                                     titre_dat=chikdata,
-                                    antigenic_map= antigenic_map,
+                                    antigenic_map= NULL,
                                     version=prior_version) # function in posteriors.R
 #> Creating posterior solving function...
 #> 
@@ -212,7 +199,7 @@ res <- foreach(x = filenames, .packages = c('serosolver','data.table','plyr')) %
   
   res <- serosolver(par_tab = start_tab, 
                     titre_dat = chikdata,
-                    antigenic_map = antigenic_map,
+                    antigenic_map = NULL,
                     start_inf_hist = start_inf, 
                     mcmc_pars = c("iterations"=500000,"adaptive_iterations"=100000,"thin"=1000,
                                   "thin_inf_hist"=1000,"save_block"=1000,
