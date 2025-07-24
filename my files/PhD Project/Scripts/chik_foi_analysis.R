@@ -283,8 +283,3 @@ cowplot::plot_grid(plot_constant, plot_time, plot_log_time, ncol = 3)
 
 
 
-
-
-
-
-
