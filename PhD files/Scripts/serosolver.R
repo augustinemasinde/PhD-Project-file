@@ -53,13 +53,8 @@ chikdata$titre[chikdata$IgM_CHIK == "Positive"] <- rlnorm(
 )
 
 #select relevant columns
-chikdata<- chikdata %>%  select(UniqueKey, Age_Yrs, Year,IgM_CHIK, titre)
+chikdata<- chikdata %>%  select(UniqueKey, Age_Yrs, Year,IgM_CHIK, titre) %>% rename(DOB = Age_Yrs)
 
-#convert to ages to birth years
-chikdata$DOB <- as.numeric(format(Sys.Date(), "%Y")) - chikdata$Age_Yrs
-
-#Data cleaning
-chikdata$DOB[chikdata$DOB == "1891"] <- "1991"
 
 #recode Nengative to Negative
 chikdata$IgM_CHIK[chikdata$IgM_CHIK == "Nengative"] <- "Negative"
@@ -70,40 +65,40 @@ chikdata$IgM_CHIK[chikdata$IgM_CHIK == "NA"] <- NA
 # Drop all real NA values
 chikdata <- chikdata[!is.na(chikdata$IgM_CHIK), ]
 
-#Data formatting for serosolver
-chikdata <- chikdata %>% select(UniqueKey,titre, DOB, Year)
-chikdata$virus<- c(rep(8037,nrow(chikdata)))
-chikdata$samples<- c(rep(2021,nrow(chikdata)))
-chikdata$run<- c(rep(1,nrow(chikdata)))
-chikdata$group <- c(rep(1,nrow(chikdata)))
-chikdata$virus <- c(rep(2021,nrow(chikdata)))
 chikdata <- chikdata %>% dplyr::rename(individual = UniqueKey)
-chikdata$titre <- log2(chikdata$titre)
-chikdata <- chikdata %>% select(individual,virus,titre,samples,DOB,run, Year)
-chikdata <- chikdata[chikdata$Year == 2021, ]
-chikdata$group <- c(rep(1, nrow(chikdata)))
-chikdata <- chikdata %>%  select(individual, DOB, virus, titre, samples, run, group)
-chikdata$individual <- 1:nrow(chikdata)
+chikdata <- chikdata %>% select(individual,DOB,titre,Year)
 chikdata <- chikdata[!is.na(chikdata$DOB), ]
 chikdata$individual <- as.integer(chikdata$individual)
-chikdata$run <- as.integer(chikdata$run)
-chikdata <- chikdata[rep(1:nrow(chikdata), each = 2), ]
-chikdata$virus <- rep(c(2019, 2020), length.out = nrow(chikdata))
 chikdata$biomarker_group <- c(rep(1,nrow(chikdata)))
+chikdata <- chikdata[!chikdata$Year %in% c(2024, 2025), ]
 
-set.seed(123)  # for reproducibility
 
-chikdata$titre <- sapply(chikdata$virus, function(year) {
-  if (year == 2019) {
-    val <- rnorm(1, mean = 3.5, sd = 1.2) 
-  } else if (year == 2020) {
-    val <- rnorm(1, mean = 5.0, sd = 1.2)  
-  } else {
-    val <- rnorm(1, mean = 4.0, sd = 1.2) 
-  }
-  val <- max(min(val, 7), 0)  
-  return(val)
-})
+set.seed(123)
+##cross sectional analysis for 2019
+chikdata <- chikdata[chikdata$Year == 2019, ]
+chikdata$virus <- c(rep(2019, nrow(chikdata)))
+chikdata$virus <- as.character(chikdata$virus)
+
+chikdata <- chikdata[complete.cases(chikdata),]
+chikdata[chikdata$titre == 0,"titre"] <- 5
+chikdata$titre <- log2(chikdata$titre/5)
+chikdata$titre <- round(chikdata$titre, 0)
+chikdata$samples <- 2019
+
+
+chikdata$samples<- c(rep(2021,nrow(chikdata)))
+
+# plot the data
+ggplot(chikdata, aes(x = titre)) +
+  geom_histogram(binwidth = 1, fill = "blue", color = "black") +
+  labs(title = "Distribution of Chikungunya Antibody Titres",
+       x = "Antibody Titre (log2 scale)",
+       y = "Frequency") +
+  theme_minimal()
+
+
+
+
 
 filename <- "serosurvey_2"
 resolution <- 1 
@@ -116,7 +111,6 @@ prior_version <- 2
 
 par_tab_path <- system.file("extdata", "par_tab_base.csv", package = "serosolver")
 par_tab <- read.csv(file = par_tab_path, stringsAsFactors=FALSE)
-
 
 ## Set parameters for Beta prior on infection histories
 beta_pars <- find_beta_prior_mode(0.15,4)
@@ -209,3 +203,8 @@ res <- foreach(x = filenames, .packages = c('serosolver','data.table','plyr')) %
                     CREATE_POSTERIOR_FUNC = create_posterior_func, 
                     version = prior_version)
 }
+
+
+
+
+chikdata$titre <- log2(chikdata$titre)
