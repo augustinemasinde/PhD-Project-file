@@ -69,44 +69,45 @@ chikdata <- chikdata %>% dplyr::rename(individual = UniqueKey)
 chikdata <- chikdata %>% select(individual,DOB,titre,Year)
 chikdata <- chikdata[!is.na(chikdata$DOB), ]
 chikdata$individual <- as.integer(chikdata$individual)
-chikdata$biomarker_group <- c(rep(1,nrow(chikdata)))
 chikdata <- chikdata[!chikdata$Year %in% c(2024, 2025), ]
 
 
 set.seed(123)
 ##cross sectional analysis for 2019
-chikdata <- chikdata[chikdata$Year == 2019, ]
-chikdata$virus <- c(rep(2019, nrow(chikdata)))
-chikdata$virus <- as.character(chikdata$virus)
-
-chikdata <- chikdata[complete.cases(chikdata),]
-chikdata[chikdata$titre == 0,"titre"] <- 5
-chikdata$titre <- log2(chikdata$titre/5)
-chikdata$titre <- round(chikdata$titre, 0)
-chikdata$samples <- 2019
-
-
-chikdata$samples<- c(rep(2021,nrow(chikdata)))
+chikdata2019 <- chikdata[chikdata$Year == 2019, ]
+chikdata2019$virus <- c(rep(2019, nrow(chikdata2019)))
+chikdata2019$titre <- log2(chikdata2019$titre)
+chikdata2019$samples <- 2019
+chikdata2019 <- chikdata2019[!is.na(chikdata2019$titre), ]
+chikdata2019$DOB <- as.integer(chikdata2019$DOB)
 
 # plot the data
-ggplot(chikdata, aes(x = titre)) +
+ggplot(chikdata2019, aes(x = titre)) +
   geom_histogram(binwidth = 1, fill = "blue", color = "black") +
-  labs(title = "Distribution of Chikungunya Antibody Titres",
+  labs(title = "Distribution of Chikungunya Antibody Titres2019",
        x = "Antibody Titre (log2 scale)",
        y = "Frequency") +
   theme_minimal()
 
+sample_year <- 2019 # Year of the serosurvey
+
+chikdata2019$DOB <- sample_year - chikdata2019$DOB # Convert DOB to age in years at the time of the survey
+
+chikdata2019 <- chikdata2019 %>%  select(individual,DOB,virus, titre,samples)
+
+## Add column for titre repeats, enumerating for each measurement for the same virus/sample/individual
+chikdata2019 <- plyr::ddply(chikdata2019,.(individual,virus,samples),function(x) cbind(x,"run"=1:nrow(x),"group"=1))
+chikdata2019$individual <- 1:nrow(chikdata2019)
 
 
+#antigenic map
+antigenic_map <-example_antigenic_map
+write.csv(antigenic_map, "antigenic_map.csv")
 
-
-filename <- "serosurvey_2"
-resolution <- 1 
-sample_year <- 2021
-
-serosolver::describe_priors()
-prior_version <- 2
-
+sample_year <- 2019 # Year of the serosurvey
+#strain isolation times
+antigenic_map <- antigenic_map[antigenic_map$inf_times >= 1945 & antigenic_map$inf_times <= sample_year,]
+strain_isolation_times <- unique(antigenic_map$inf_times)
 
 
 par_tab_path <- system.file("extdata", "par_tab_base.csv", package = "serosolver")
@@ -128,24 +129,6 @@ par_tab[par_tab$names %in% c("mu_short","sigma2","wane"),"fixed"] <- 1 # mu_shor
 par_tab[par_tab$names %in% c("mu_short","sigma2","wane"),"values"] <- 0 # set these values to 0
 
 
-## Distinct filename for each chain
-no_chains <- 5
-filenames <- paste0(filename, "_",1:no_chains)
-chain_path <- sub("par_tab_base.csv","",par_tab_path)
-chain_path_real <- paste0(chain_path, "cs2_real/")
-chain_path_sim <- paste0(chain_path, "cs2_sim/")
-
-#abtibody data
-antibody_data <- chikdata %>%  select(individual, samples, DOB, titre)
-antibody_data$biomarker_group <- c(rep(1, nrow(antibody_data)))
-antibody_data$biomarker_id<- c(rep(2021, nrow(antibody_data)))
-antibody_data$repeat_number<- c(rep(1, nrow(antibody_data)))
-antibody_data$population_group <- c(rep(1, nrow(antibody_data)))
-antibody_data$birth<- c(rep(2021, nrow(antibody_data)))
-antibody_data$biomarker_group<- c(rep(1, nrow(antibody_data)))
-antibody_data <- antibody_data %>%  rename(measurement = titre)
-antibody_data <- antibody_data %>%  rename(sample_time = samples)
-antibody_data<- antibody_data %>%  select(individual, sample_time, biomarker_id,biomarker_group, measurement,repeat_number,population_group,birth)
 
 
 ## Distinct filename for each chain
@@ -156,23 +139,17 @@ chain_path_real <- paste0(chain_path, "cs2_real/")
 chain_path_sim <- paste0(chain_path, "cs2_sim/")
 
 
-## More flexible version of the above function
-virus_key <- c("EAL" = 2019, "SAL" = 2020, "EAL1" = 2019, "SAL1" = 2020)
-antigenic_coords$Strain <- virus_key[antigenic_coords$Strain]
-antigenic_map <- generate_antigenic_map_flexible(antigenic_coords,buckets = 1, spar = 0.3)
-
-## Restrict entries to years of interest. Entries in antigenic_map determine
-## the times that individual can be infected ie. the dimensions of the infection
-## history matrix.
-antigenic_map <- antigenic_map[antigenic_map$inf_times >= 2019 & antigenic_map$inf_times <= sample_year,]
-strain_isolation_times <- unique(antigenic_map$inf_times)
-
+antibody_data<- antibody_data %>% rename(sample_time = samples)
 ## Create the posterior solving function that will be used in the MCMC framework 
 model_func <- create_posterior_func(par_tab=par_tab,
                                     antibody_data = antibody_data,
-                                    titre_dat=chikdata,
-                                    antigenic_map= NULL,
-                                    version=prior_version) # function in posteriors.R
+                                    function_type = 1,
+                                    data_type = 1,
+                                    n_alive = NULL,
+                                    biomarker_groups_weights = NULL,
+                                    titre_dat=chikdata2019,
+                                    antigenic_map= antigenic_map,
+                                    version=1) # function in posteriors.R
 #> Creating posterior solving function...
 #> 
 ## Generate results in parallel
@@ -185,15 +162,15 @@ res <- foreach(x = filenames, .packages = c('serosolver','data.table','plyr')) %
     start_tab <- generate_start_tab(par_tab)
     
     ## Generate starting infection history
-    start_inf <- setup_infection_histories_titre(chikdata, strain_isolation_times, 
+    start_inf <- setup_infection_histories_titre(chikdata2019, strain_isolation_times, 
                                                  space=3,titre_cutoff=4)
     start_prob <- sum(model_func(start_tab$values, start_inf)[[1]])
   }
   
   
   res <- serosolver(par_tab = start_tab, 
-                    titre_dat = chikdata,
-                    antigenic_map = NULL,
+                    titre_dat = chikdata2019,
+                    antigenic_map = antigenic_map,
                     start_inf_hist = start_inf, 
                     mcmc_pars = c("iterations"=500000,"adaptive_iterations"=100000,"thin"=1000,
                                   "thin_inf_hist"=1000,"save_block"=1000,
@@ -207,4 +184,3 @@ res <- foreach(x = filenames, .packages = c('serosolver','data.table','plyr')) %
 
 
 
-chikdata$titre <- log2(chikdata$titre)
