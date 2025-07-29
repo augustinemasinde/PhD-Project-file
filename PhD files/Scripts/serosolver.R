@@ -1,44 +1,13 @@
-install.packages("doMC")
+devtools::install_github("seroanalytics/serosolver", force = TRUE)
 library(serosolver)
-library(ggplot2)
-library(coda)
 library(plyr)
-library(reshape2)
 library(data.table)
-library(tidyr)
-library(doParallel)
-library(foreach)
-library(ggpubr)
-library(bayesplot)
-library(viridis)
-library(ggthemes)
-library(cowplot)
-library(grid)
-library(gridExtra)
-library(doRNG)
-library(serosim)
-library(tidyverse)
-library(readxl)
-library(doMC)
-library(here)
-set.seed(0)
+library(ggplot2)
 
-# Setup -------------------------------------------------------------------
-serosolver <- FALSE
 
-## Filename prefix for all saved outputs
-filename <- "chikungunya_data_test"
-filenames <- paste0(filename, "_",1:5)
-cl <- makeCluster(detectCores(), type='PSOCK')
-registerDoParallel(cl)
-registerDoMC(cores=5)
-stopCluster(cl)
-foreach(i = 1:5) %dopar% { Sys.getpid() }
 
-#import data
-chikdata <-read_excel(here("Data", "chikungunya_data_Uganda.xlsx"))
+chikdata <- read_excel("~/Desktop/PhD files/Data/chikungunya_data_Uganda.xlsx")
 
-set.seed(123) 
 
 chikdata$titre <- NA_real_
 
@@ -71,8 +40,6 @@ chikdata <- chikdata[!is.na(chikdata$DOB), ]
 chikdata$individual <- as.integer(chikdata$individual)
 chikdata <- chikdata[!chikdata$Year %in% c(2024, 2025), ]
 
-
-set.seed(123)
 ##cross sectional analysis for 2019
 chikdata2019 <- chikdata[chikdata$Year == 2019, ]
 chikdata2019$virus <- c(rep(2019, nrow(chikdata2019)))
@@ -80,33 +47,16 @@ chikdata2019$titre <- log2(chikdata2019$titre)
 chikdata2019$samples <- 2019
 chikdata2019 <- chikdata2019[!is.na(chikdata2019$titre), ]
 chikdata2019$DOB <- as.integer(chikdata2019$DOB)
-
-# plot the data
-ggplot(chikdata2019, aes(x = titre)) +
-  geom_histogram(binwidth = 1, fill = "blue", color = "black") +
-  labs(title = "Distribution of Chikungunya Antibody Titres2019",
-       x = "Antibody Titre (log2 scale)",
-       y = "Frequency") +
-  theme_minimal()
-
 sample_year <- 2019 # Year of the serosurvey
-
 chikdata2019$DOB <- sample_year - chikdata2019$DOB # Convert DOB to age in years at the time of the survey
-
 chikdata2019 <- chikdata2019 %>%  select(individual,DOB,virus, titre,samples)
-
 ## Add column for titre repeats, enumerating for each measurement for the same virus/sample/individual
 chikdata2019 <- plyr::ddply(chikdata2019,.(individual,virus,samples),function(x) cbind(x,"run"=1:nrow(x),"group"=1))
 chikdata2019$individual <- 1:nrow(chikdata2019)
 
-
-#antigenic map
-antigenic_map <-example_antigenic_map
-write.csv(antigenic_map, "antigenic_map.csv")
-
 sample_year <- 2019 # Year of the serosurvey
 #strain isolation times
-antigenic_map <- antigenic_map[antigenic_map$inf_times >= 1945 & antigenic_map$inf_times <= sample_year,]
+antigenic_map <- antigenic_map[antigenic_map$inf_times >= 1968 & antigenic_map$inf_times <= sample_year,]
 strain_isolation_times <- unique(antigenic_map$inf_times)
 
 
@@ -141,8 +91,8 @@ chain_path_sim <- paste0(chain_path, "cs2_sim/")
 
 antibody_data<- antibody_data %>% rename(sample_time = samples)
 ## Create the posterior solving function that will be used in the MCMC framework 
-model_func <- create_posterior_func(par_tab=par_tab,
-                                    antibody_data = antibody_data,
+model_func <- create_posterior_func(par_tab= par_tab,
+                                    antibody_data = NULL,
                                     function_type = 1,
                                     data_type = 1,
                                     n_alive = NULL,
@@ -150,8 +100,6 @@ model_func <- create_posterior_func(par_tab=par_tab,
                                     titre_dat=chikdata2019,
                                     antigenic_map= antigenic_map,
                                     version=1) # function in posteriors.R
-#> Creating posterior solving function...
-#> 
 ## Generate results in parallel
 res <- foreach(x = filenames, .packages = c('serosolver','data.table','plyr')) %dopar% {
   ## Not all random starting conditions return finite likelihood, so for each chain generate random
