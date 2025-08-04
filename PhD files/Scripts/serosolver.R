@@ -1,5 +1,6 @@
 devtools::install_github("seroanalytics/serosolver", force = TRUE)
 ## Required for this analysis
+library(serosolver)
 library(reshape2)
 library(foreach)
 library(doParallel)
@@ -11,6 +12,8 @@ library(ggpubr)
 library(lubridate)
 library(here)
 library(readxl)
+library(dplyr)
+library(tidyverse)
 # set up cluster
 set.seed(0)
 cl <- makeCluster(5)
@@ -26,7 +29,8 @@ if(Sys.info()[["sysname"]]=="Darwin" | Sys.info()[["sysname"]]=="Linux"){
   registerDoParallel(cl)
 }
 
-
+# Set the prior version
+prior_version <- 2
 
 #import data
 chikdata <- read_excel(here("Data", "chikungunya_data_Uganda.xlsx"))
@@ -116,8 +120,8 @@ chikdata$individual <- match(chikdata$individual, indivs)
 
 # Ensure that the data is unique
 chikdata <- unique(chikdata)
-chikdata<- plyr::ddply(chikdata,.(individual,virus,samples),
-                         function(x) cbind(x,"run"=1:nrow(x),"group"=1))
+chikdata <- plyr::ddply(chikdata, ~individual + virus + samples,
+                        function(x) cbind(x, run = 1:nrow(x), group = 1))
 
 # Convert virus, titre, and DOB to integer
 chikdata <- chikdata %>%
