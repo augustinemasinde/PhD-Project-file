@@ -18,7 +18,6 @@ library(tidyverse)
 set.seed(0)
 cl <- makeCluster(5)
 
-## Note that this vignette was generated on a Windows machine,
 ## and the setup for parallelisation is different on a Linux or Mac:
 
 if(Sys.info()[["sysname"]]=="Darwin" | Sys.info()[["sysname"]]=="Linux"){
