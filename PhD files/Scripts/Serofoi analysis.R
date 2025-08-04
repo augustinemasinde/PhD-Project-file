@@ -1,6 +1,7 @@
 library(readxl)
 library(dplyr)
 library(here)
+library(serofoi)
 chikdata <- read_excel(here("data", "chikungunya_data_Uganda.xlsx"))
 chikdata <- chikdata %>%  select(UniqueKey, Year, Age_Yrs,IgM_CHIK)
 chikdata <- chikdata %>%
