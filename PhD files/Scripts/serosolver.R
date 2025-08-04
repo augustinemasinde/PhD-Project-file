@@ -73,6 +73,7 @@ resolution <- 4 # Resolution of the serosurvey, on quartely basis
 sample_year <- 2019: 2022 # Year of the serosurvey
 #Data preparation
 
+# Create a sequence of sample years
 years <- 2019:2022
 
 
@@ -130,7 +131,8 @@ chikdata <- chikdata %>%
     titre = as.integer(titre),
     DOB = as.integer(DOB)  
   )
-
+#convert titre to log2 scale
+chikdata$titre <- log2(chikdata$titre)
 
 strain_isolation_times <- seq(sample_years[1]*resolution+1, sample_years[4]*resolution, by=1)
 
