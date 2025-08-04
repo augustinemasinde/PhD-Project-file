@@ -164,13 +164,14 @@ chain_path_sim <- paste0(chain_path, "cs1_sim/")
 
 ## Create the posterior solving function that will be used in the MCMC framework 
 par_tab[par_tab$names == "mu_short","lower_bound"] <- 1
-model_func <- create_posterior_func(par_tab=par_tab,
+
+model_func <- create_posterior_func(par_tab = par_tab,
+                                    titre_dat = chikdata,
                                     antigenic_map = NULL, # no antigenic map
-                                    antibody_data = NULL, # no antibody data
-                                    chikdata,
                                     strain_isolation_times = strain_isolation_times,
-                                    possible_exposure_times=possible_exposure_times,
-                                    version=prior_version) # function in posteriors.R
+                                    possible_exposure_times = possible_exposure_times, # no possible exposure times
+                                     # no possible exposure times
+                                    version= prior_version) # function in posteriors.R
 #> Creating posterior solving function...
 ## Generate results in parallel
 res <- foreach(x = filenames, .packages = c('serosolver','data.table','plyr')) %dopar% {
