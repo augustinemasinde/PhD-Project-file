@@ -71,12 +71,13 @@ chikdata$titre <- round(chikdata$titre, 2)
 filename <- "chik_2019"
 resolution <- 4 # Resolution of the serosurvey, on quartely basis
 sample_year <- 2019: 2022 # Year of the serosurvey
-#Data preparation
+
+#Data preparation(create a hypothetical serosurvey data that serosolver can use)
 
 # Create a sequence of sample years
 years <- 2019:2022
 
-
+# Create a sequence of sample years for each individual
 chikdata <- chikdata %>%
   slice(rep(1:n(), each = 4)) %>%  
   mutate(year = rep(years, times = nrow(chikdata)))
