@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Breweks Interior Supplies</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+      color: #333;
+    }
+
+    header {
+      background-color: #2c3e50;
+      color: white;
+      padding: 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+
+    nav {
+      flex-grow: 1;
+      margin: 1rem 2rem;
+    }
+
+    .nav-menu {
+      display: flex;
+      list-style: none;
+      gap: 1rem;
+      position: relative;
+    }
+
+    .nav-menu li {
+      position: relative;
+    }
+
+    .nav-menu > li > a {
+      color: white;
+      text-decoration: none;
+      padding: 0.5rem;
+      display: inline-block;
+    }
+
+    .dropdown {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background-color: #34495e;
+      list-style: none;
+      padding: 0.5rem 0;
+      min-width: 200px;
+      border-radius: 5px;
+      z-index: 10;
+    }
+
+    .dropdown li a {
+      color: white;
+      text-decoration: none;
+      display: block;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+    }
+
+    .nav-menu li:hover .dropdown {
+      display: block;
+    }
+
+    .header-controls {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .header-controls input[type="text"] {
+      padding: 0.5rem;
+      border: none;
+      border-radius: 5px;
+    }
+
+    .header-controls button {
+      padding: 0.5rem 1rem;
+      background-color: #e67e22;
+      border: none;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .contact-popup {
+      display: none;
+      position: absolute;
+      top: 60px;
+      right: 10px;
+      background: #fff;
+      color: #333;
+      padding: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      z-index: 99;
+    }
+
+    .contact-popup a {
+      display: block;
+      color: #2c3e50;
+      text-decoration: none;
+      margin-bottom: 0.5rem;
+    }
+
+    .main {
+      padding: 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+
+    .promo-section {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+
+    .promo-item {
+      background-color: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    .promo-item img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+    }
+
+    .promo-item h3 {
+      padding: 0.5rem 1rem;
+    }
+
+    .promo-item p {
+      color: #e74c3c;
+      font-weight: bold;
+      margin-bottom: 1rem;
+    }
+
+    .footer {
+      background-color: #2c3e50;
+      color: white;
+      text-align: center;
+      padding: 1rem;
+      margin-top: 2rem;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="logo">Breweks Interior Supplies</div>
+    <nav>
+      <ul class="nav-menu">
+        <li><a href="#">Shower Cubicles</a>
+          <ul class="dropdown">
+            <li><a onclick="filterByCategory('Round Shower')">Round Shower</a></li>
+            <li><a onclick="filterByCategory('Corner Shower')">Corner Shower</a></li>
+            <li><a onclick="filterByCategory('Shower Wall')">Shower Wall</a></li>
+            <li><a onclick="filterByCategory('Frameless')">Frameless</a></li>
+          </ul>
+        </li>
+        <li><a href="#">Tiles</a>
+          <ul class="dropdown">
+            <li><a onclick="filterByCategory('Porcelain Tiles')">Porcelain Tiles</a></li>
+            <li><a onclick="filterByCategory('Ceramic Tiles')">Ceramic Tiles</a></li>
+            <li><a onclick="filterByCategory('Wall Tiles')">Wall Tiles</a></li>
+            <li><a onclick="filterByCategory('Floor Tiles')">Floor Tiles</a></li>
+          </ul>
+        </li>
+        <li><a href="#">Kitchen</a>
+          <ul class="dropdown">
+            <li><a onclick="filterByCategory('Double Bowl Sink')">Double Bowl Sink</a></li>
+            <li><a onclick="filterByCategory('Single Bowl Sink')">Single Bowl Sink</a></li>
+            <li><a onclick="filterByCategory('Kitchen Cabinets')">Kitchen Cabinets</a></li>
+          </ul>
+        </li>
+        <li><a href="#">Bathroom</a>
+          <ul class="dropdown">
+            <li><a onclick="filterByCategory('Bathroom Vanities')">Bathroom Vanities</a></li>
+            <li><a onclick="filterByCategory('Bathroom Ceramics')">Bathroom Ceramics</a></li>
+            <li><a onclick="filterByCategory('Bathroom Furniture')">Bathroom Furniture</a></li>
+          </ul>
+        </li>
+        <li><a href="#">Installation</a>
+          <ul class="dropdown">
+            <li><a onclick="filterByCategory('Installation Accessories')">Installation Accessories</a></li>
+            <li><a onclick="filterByCategory('Installation Equipment')">Installation Equipment</a></li>
+          </ul>
+        </li>
+      </ul>
+    </nav>
+    <div class="header-controls">
+      <input type="text" id="searchInput" placeholder="Search products..." oninput="filterProducts()" />
+      <button onclick="toggleContactPopup()">Contact Us</button>
+      <button>Order Now</button>
+    </div>
+    <div id="contactPopup" class="contact-popup">
+      <a href="tel:+25423953725">Tel.1:+25423953725</a>
+      <a href="tel:+254705156044">Tel.2:+254705156044</a>
+      <a href="mailto:augustinemasinde7@gmail.com">Email 1: augustinemasinde7@gmail.com</a>
+      <a href="mailto:brenda@gmail.com">Email 2: brendaogeto@gmail.com</a>
+    </div>
+  </header>
+
+  <main class="main">
+    <h1>Welcome to Breweks Interior Supplies</h1>
+    <p style="text-align: center;">Explore our premium selection of bathroom and kitchen interior materials.</p>
+
+    <section class="promo-section" id="promoSection">
+      <!-- Dynamic promo items will appear here -->
+    </section>
+  </main>
+
+  <footer class="footer">
+    &copy; 2025 Breweks Interior Supplies. All rights reserved.
+  </footer>
+
+  <script>
+    const products = [
+      { name: "Round Shower", category: "Round Shower", discount: "Save 20%", image: "/Users/augustinemasinde/Desktop/web/images/round-shower.png"},
+      { name: "Premium Round Shower", category: "Round Shower", discount: "15% Off", image: "https://via.placeholder.com/300x180?text=Premium+Round+Shower" },
+      { name: "Porcelain Tiles", category: "Porcelain Tiles", discount: "Up to 30% Off", image: "https://via.placeholder.com/300x180?text=Porcelain+Tiles" },
+      { name: "Glossy Porcelain Tile", category: "Porcelain Tiles", discount: "25% Off", image: "https://via.placeholder.com/300x180?text=Glossy+Tile" },
+      { name: "Vanity Unit", category: "Bathroom Vanities", discount: "15% Discount", image: "https://via.placeholder.com/300x180?text=Vanity+Unit" },
+      { name: "Modern Vanity Set", category: "Bathroom Vanities", discount: "10% Off", image: "https://via.placeholder.com/300x180?text=Modern+Vanity" },
+      { name: "Double Bowl Sink", category: "Double Bowl Sink", discount: "Save 10%", image: "https://via.placeholder.com/300x180?text=Double+Sink" },
+      { name: "Deep Bowl Sink", category: "Double Bowl Sink", discount: "Save 15%", image: "https://via.placeholder.com/300x180?text=Deep+Bowl+Sink" },
+      { name: "Shower Hose Kit", category: "Installation Accessories", discount: "Save 10%", image: "https://via.placeholder.com/300x180?text=Shower+Hose+Kit" },
+      { name: "Pipe Connectors", category: "Installation Accessories", discount: "Save 5%", image: "https://via.placeholder.com/300x180?text=Pipe+Connectors" },
+      { name: "Electric Drill", category: "Installation Equipment", discount: "Save 20%", image: "https://via.placeholder.com/300x180?text=Electric+Drill" },
+      { name: "Tile Cutter", category: "Installation Equipment", discount: "15% Off", image: "https://via.placeholder.com/300x180?text=Tile+Cutter" }
+    ];
+
+    function renderProducts(list = products.slice(0, 4)) {
+      const promoSection = document.getElementById("promoSection");
+      promoSection.innerHTML = "";
+      list.forEach(product => {
+        const div = document.createElement("div");
+        div.className = "promo-item";
+        div.innerHTML = `
+          <img src="${product.image}" alt="${product.name}" />
+          <h3>${product.name}</h3>
+          <p>${product.discount}</p>
+        `;
+        promoSection.appendChild(div);
+      });
+    }
+
+    function filterProducts() {
+      const searchInput = document.getElementById("searchInput").value.toLowerCase();
+      const filtered = products.filter(p => p.name.toLowerCase().includes(searchInput));
+      renderProducts(filtered);
+    }
+
+    function filterByCategory(category) {
+      const filtered = products.filter(p => p.category === category);
+      renderProducts(filtered);
+    }
+
+    function toggleContactPopup() {
+      const popup = document.getElementById("contactPopup");
+      popup.style.display = popup.style.display === "block" ? "none" : "block";
+    }
+
+    // Initial load
+    renderProducts();
+  </script>
+</body>
+
+</html>
