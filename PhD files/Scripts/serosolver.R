@@ -27,7 +27,7 @@ if(Sys.info()[["sysname"]]=="Darwin" | Sys.info()[["sysname"]]=="Linux"){
 }else{
   registerDoParallel(cl)
 }
-
+serosolver::describe_priors()
 # Set the prior version
 prior_version <- 2
 
@@ -165,14 +165,11 @@ chain_path_sim <- paste0(chain_path, "cs1_sim/")
 ## Create the posterior solving function that will be used in the MCMC framework 
 par_tab[par_tab$names == "mu_short","lower_bound"] <- 1
 
-model_func <- create_posterior_func(par_tab = par_tab,
-                                    titre_dat = chikdata,
-                                    antigenic_map = NULL, # no antigenic map
+model_func <- create_posterior_func(par_tab=par_tab,
+                                    antigenic_map = NULL,
+                                    titre_dat=chikdata,
                                     strain_isolation_times = strain_isolation_times,
-                                    possible_exposure_times = possible_exposure_times, # no possible exposure times
-                                     # no possible exposure times
-                                    version= prior_version) # function in posteriors.R
-#> Creating posterior solving function...
+                                    version=prior_version) # function in posteriors.R
 ## Generate results in parallel
 res <- foreach(x = filenames, .packages = c('serosolver','data.table','plyr')) %dopar% {
   ## Not all random starting conditions return finite likelihood, so for each chain generate random
@@ -189,18 +186,18 @@ res <- foreach(x = filenames, .packages = c('serosolver','data.table','plyr')) %
   }
   
   res <- serosolver(par_tab = start_tab, 
-                    titre_dat = chikdata,
-                    antigenic_map = NULL,
-                    strain_isolation_times = strain_isolation_times,
-                    start_inf_hist = start_inf, 
-                    mcmc_pars = c("iterations"=2000000,"target_acceptance_rate_theta"=0.44,"target_acceptance_rate_inf_hist"=0.44,
-                                  "adaptive_frequency"=1000,"thin"=1,"adaptive_iterations"=500000, 
-                                  "save_block"=1000, "thin_inf_hist"=100,"proposal_inf_hist_indiv_prop"=1,
-                                  "proposal_ratio"=2, "burnin"=0, "proposal_inf_hist_time_prop"=0.5, 
-                                  "proposal_inf_hist_distance"=3,"proposal_inf_hist_adaptive"=1,"proposal_inf_hist_indiv_swap_ratio"=0.5,
-                                  "proposal_inf_hist_group_swap_ratio"=0.5,"proposal_inf_hist_group_swap_prop"=1),
-                    filename = paste0(chain_path_real,x), 
-                    CREATE_POSTERIOR_FUNC = create_posterior_func, 
-                    version = prior_version)
+                  titre_dat = chikdata,
+                  antigenic_map = NULL,
+                  strain_isolation_times = strain_isolation_times,
+                  start_inf_hist = start_inf, 
+                  mcmc_pars = c("iterations"=2000000,"popt"=0.44,"popt_hist"=0.44,
+                                "opt_freq"=1000,"thin"=1,"adaptive_period"=500000, 
+                                "save_block"=1000, "thin_hist"=100,"hist_sample_prob"=1,
+                                "switch_sample"=2, "burnin"=0, "inf_propn"=0.5, 
+                                "move_size"=3,"hist_opt"=1,"swap_propn"=0.5,
+                                "hist_switch_prob"=0.5,"year_swap_propn"=1),
+                  filename = paste0(chain_path_real,x), 
+                  CREATE_POSTERIOR_FUNC = create_posterior_func, 
+                  version = prior_version)
 }
 
