@@ -165,6 +165,7 @@ chain_path_sim <- paste0(chain_path, "cs1_sim/")
 ## Create the posterior solving function that will be used in the MCMC framework 
 par_tab[par_tab$names == "mu_short","lower_bound"] <- 1
 model_func <- create_posterior_func(par_tab=par_tab,
+                                    antigenic_map = NULL, # no antigenic map
                                     antibody_data = NULL, # no antibody data
                                     chikdata,
                                     strain_isolation_times = strain_isolation_times,
