@@ -301,15 +301,15 @@ cowplot::plot_grid(plot_constant, plot_time, plot_log_time, ncol = 3)
 
 ######### Simulating a serosurvey for chikungunya with constant endemic transmission
 survey_features1 <- data.frame(
-  age_min = c(1,6,12,19,50,55),
-  age_max = c(5,11,18,49,54,97),
-  n_sample = c(118,149,144,920,51,158)
+  age_min = c(1,10,20,30,40,50,60,70,80,90),
+  age_max = c(9,19,29,39,49,59,69,79,89,99),
+  n_sample = c(139770,138211,120435,115148,114233,74492,44518,25591,10815,2014)
 )
-survey_year <- 2025
+survey_year <- 2005
 year_min <- survey_year - max(survey_features1$age_max)
 foi_df <- data.frame(
   year = (year_min:(survey_year - 1)),
-  foi = 0.02
+  foi = 0.01
 )
 
 serosurvey_constant1 <- simulate_serosurvey(
@@ -327,3 +327,4 @@ seromodel_constant <- fit_seromodel(
 )
 
 plot_seromodel(seromodel = seromodel_constant, serosurvey = serosurvey_constant1)
+
