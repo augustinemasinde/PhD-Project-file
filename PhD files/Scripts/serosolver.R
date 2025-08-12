@@ -113,14 +113,15 @@ chikdata <- chikdata %>%
 indivs <- unique(chikdata$individual) #all individuals
 
 # Subset data for indivs
-chikdata <- chikdata[chikdata$individual %in% indivs,
-                       c("individual","virus","titre","samples","DOB")]
+chikdata <- plyr::ddply(
+  chikdata,
+  ~ individual + virus + samples,
+  function(x) cbind(x, "run" = 1:nrow(x), "group" = 1)
+)
+
 chikdata$individual <- match(chikdata$individual, indivs)
 
 
-chikdata <- unique(chikdata)
-chikdata <- plyr::ddply(chikdata,.(individual,virus,samples),
-                         function(x) cbind(x,"run"=1:nrow(x),"group"=1))
 print(head(chikdata))
 # Convert virus, titre, and DOB to integer
 chikdata <- chikdata %>%
